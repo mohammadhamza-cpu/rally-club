@@ -206,9 +206,13 @@ def main():
                 touch('touchCancel',[]);c.wait(f'!{G}.players[0].charging')
                 check('Touch cancellation discards charged hit without firing',c.js(f'{G}.players[0].swings===0 && {G}.players[0].chargeSeconds===0'))
                 for kind,modifier in [('net','drop'),('clear','jump')]:
-                    c.js(f'contact(0,{json.dumps(kind)})');hits=c.js(f'{G}.totalHits')
-                    touch('touchStart',[c.point(f'[data-control="{modifier}"]'),hit]);time.sleep(.07);touch('touchEnd',[]);c.wait(f'{G}.totalHits>{hits}')
-                    check(f'Touch modifier plus Hit makes a {kind} shot',c.js(f'{G}.shuttle.kind==={json.dumps(kind)}'))
+                    c.js('neutral()')
+                    touch('touchStart',[c.point(f'[data-control="{modifier}"]'),hit]);time.sleep(.07)
+                    # Fixture at release, not before the charge: rendering/network
+                    # latency must not turn this modifier test into a timed miss.
+                    c.js(f"(()=>{{const g={G},p=g.players[0];p.vy=0;Object.assign(g.shuttle,{{x:p.x+70,y:p.y-105,vx:-40,vy:0,lastHitter:1,live:true}});}})()")
+                    touch('touchEnd',[]);c.wait(f'{G}.players[0].hits===1')
+                    check(f'Touch modifier plus Hit makes a {kind} shot',c.js(f'{G}.players[0].hits===1 && {G}.shuttle.kind==={json.dumps(kind)}'))
                 c.js('neutral()');touch('touchStart',[right]);touch('touchCancel',[]);check('Touch cancellation does not leave sticky movement',c.js('RallyClub.controls.held.size===0'))
                 c.screenshot(ARTIFACTS/'mobile-play.png')
                 c.click('#help');check('Mobile help is scrollable inside its panel',c.js("(()=>{const p=document.querySelector('.panel');return p.clientHeight<=document.querySelector('.overlay').clientHeight && getComputedStyle(p).overflowY==='auto'})()"))

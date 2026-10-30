@@ -75,6 +75,13 @@ local run had zero page JavaScript/console errors and zero HTTP/HTTPS requests.
 Audio was checked programmatically, not listened to; touch used Chrome emulation.
 This is not a claim of testing every browser or physical mobile device.
 
+The GitHub Pages version also passed **99 hosted Chrome checks, 88 hosted engine
+tests and six complete simulations**. All 12 served runtime files were matched
+byte-for-byte with the local release. The successful hosted run reported no page
+JavaScript/console errors and requested only its own static site files. The touch
+modifier test places its contact fixture immediately before release so browser
+latency cannot accidentally turn that modifier check into a missed shot.
+
 Open [the engine test page](tests/index.html) to run its 88 checks. To run the full
 suite, use Python 3 and a Chromium-family browser from the repository root:
 
